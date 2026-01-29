@@ -1838,6 +1838,12 @@ impl LocalConfig {
             store = true;
         }
         
+        // 默认强制使用中继模式
+        if !config.options.contains_key("force-always-relay") {
+            config.options.insert("force-always-relay".to_string(), "Y".to_string());
+            store = true;
+        }
+        
         if store {
             config.store();
         }
