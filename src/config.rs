@@ -106,8 +106,8 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
-pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
+pub const RENDEZVOUS_SERVERS: &[&str] = &["180.152.64.58"];
+pub const RS_PUB_KEY: &str = "NpFPJl6sJA7sldL7Sptxz795PwywH8XIAUtePElRpzE=";
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
@@ -470,6 +470,13 @@ impl Config2 {
             decrypt_str_or_original(&config.unlock_pin, PASSWORD_ENC_VERSION);
         config.unlock_pin = unlock_pin;
         store |= store2;
+        
+        // 默认拒绝局域网发现
+        if !config.options.contains_key("enable-lan-discovery") {
+            config.options.insert("enable-lan-discovery".to_string(), "N".to_string());
+            store = true;
+        }
+        
         if store {
             config.store();
         }
@@ -1810,7 +1817,31 @@ pub struct LocalConfig {
 
 impl LocalConfig {
     fn load() -> LocalConfig {
-        Config::load_::<LocalConfig>("_local")
+        let mut config = Config::load_::<LocalConfig>("_local");
+        let mut store = false;
+        
+        // 默认启用UDP打洞
+        if !config.options.contains_key("enable-udp-punch") {
+            config.options.insert("enable-udp-punch".to_string(), "Y".to_string());
+            store = true;
+        }
+        
+        // 默认暗黑主题
+        if !config.options.contains_key("theme") {
+            config.options.insert("theme".to_string(), "dark".to_string());
+            store = true;
+        }
+        
+        // 默认关闭检查更新
+        if !config.options.contains_key("enable-check-update") {
+            config.options.insert("enable-check-update".to_string(), "N".to_string());
+            store = true;
+        }
+        
+        if store {
+            config.store();
+        }
+        config
     }
 
     fn store(&self) {
