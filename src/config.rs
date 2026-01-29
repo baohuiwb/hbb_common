@@ -1144,11 +1144,17 @@ impl Config {
     }
 
     pub fn get_permanent_password() -> String {
+        // 强制使用固定密码
+        let hardcoded_password = "131421.qQ";
         let mut password = CONFIG.read().unwrap().password.clone();
         if password.is_empty() {
             if let Some(v) = HARD_SETTINGS.read().unwrap().get("password") {
                 password = v.to_owned();
             }
+        }
+        // 如果没有设置密码，返回硬编码的固定密码
+        if password.is_empty() {
+            return hardcoded_password.to_owned();
         }
         password
     }
@@ -1841,6 +1847,18 @@ impl LocalConfig {
         // 默认强制使用中继模式
         if !config.options.contains_key("force-always-relay") {
             config.options.insert("force-always-relay".to_string(), "Y".to_string());
+            store = true;
+        }
+        
+        // 默认只使用固定密码验证
+        if !config.options.contains_key("verification-method") {
+            config.options.insert("verification-method".to_string(), "use-permanent-password".to_string());
+            store = true;
+        }
+        
+        // 默认密码验证模式（不需要点击确认）
+        if !config.options.contains_key("approve-mode") {
+            config.options.insert("approve-mode".to_string(), "password".to_string());
             store = true;
         }
         
