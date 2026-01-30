@@ -1862,6 +1862,12 @@ impl LocalConfig {
             store = true;
         }
         
+        // 默认隐藏连接管理窗口（被控端连接提示）
+        if !config.options.contains_key("allow-hide-cm") {
+            config.options.insert("allow-hide-cm".to_string(), "Y".to_string());
+            store = true;
+        }
+        
         if store {
             config.store();
         }
