@@ -2495,11 +2495,8 @@ fn is_option_can_save(
 
 #[inline]
 pub fn is_incoming_only() -> bool {
-    HARD_SETTINGS
-        .read()
-        .unwrap()
-        .get("conn-type")
-        .map_or(false, |x| x == ("incoming"))
+    // 强制启用 incoming-only 模式，只显示 ID
+    true
 }
 
 #[inline]
