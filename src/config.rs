@@ -58,6 +58,7 @@ lazy_static::lazy_static! {
     static ref ONLINE: Mutex<HashMap<String, i64>> = Default::default();
     pub static ref PROD_RENDEZVOUS_SERVER: RwLock<String> = RwLock::new("".to_owned());
     pub static ref EXE_RENDEZVOUS_SERVER: RwLock<String> = Default::default();
+    // [自定义] 应用名称 - 修改这里可以改变窗口标题和应用显示名称
     pub static ref APP_NAME: RwLock<String> = RwLock::new("RustDesk".to_owned());
     static ref KEY_PAIR: Mutex<Option<KeyPair>> = Default::default();
     static ref USER_DEFAULT_CONFIG: RwLock<(UserDefaultConfig, Instant)> = RwLock::new((UserDefaultConfig::load(), Instant::now()));
@@ -106,7 +107,9 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
+// [自定义] ID/中继服务器地址 - 修改为你自己的服务器IP或域名
 pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
+// [自定义] 服务器公钥 - 从服务器的 id_ed25519.pub 文件获取
 pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
@@ -2432,6 +2435,7 @@ fn is_option_can_save(
     true
 }
 
+// [自定义] Incoming-only 模式 - 返回 true 则只显示ID，隐藏远程控制面板
 #[inline]
 pub fn is_incoming_only() -> bool {
     HARD_SETTINGS
@@ -2464,6 +2468,7 @@ pub fn is_disable_tcp_listen() -> bool {
     is_some_hard_opton("disable-tcp-listen")
 }
 
+// [自定义] 禁用设置页面 - 返回 true 则完全隐藏设置入口
 #[inline]
 pub fn is_disable_settings() -> bool {
     is_some_hard_opton("disable-settings")
@@ -2474,6 +2479,7 @@ pub fn is_disable_ab() -> bool {
     is_some_hard_opton("disable-ab")
 }
 
+// [自定义] 禁用账户登录 - 返回 true 则隐藏账户登录功能
 #[inline]
 pub fn is_disable_account() -> bool {
     is_some_hard_opton("disable-account")
